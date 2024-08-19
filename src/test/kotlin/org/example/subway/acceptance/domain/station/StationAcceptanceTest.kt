@@ -1,14 +1,12 @@
 package org.example.subway.acceptance.domain.station
 
 import io.restassured.RestAssured
-import io.restassured.http.ContentType
-import org.example.subway.AcceptanceTest
+import org.example.subway.*
 import org.example.subway.domain.station.dto.request.CreateStationRequest
 import org.example.subway.domain.station.dto.response.GetStationResponse
 import org.example.subway.domain.station.entity.Station
 import org.example.subway.domain.station.repository.StationRepository
 import org.example.subway.domain.station.service.StationService
-import org.example.subway.getList
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -29,11 +27,7 @@ class StationAcceptanceTest : AcceptanceTest() {
     @DisplayName("지하철 역을 생성할 수 있다.")
     fun 역_생성_테스트() {
         // when 지하철 역 생성 API 을 호출하면
-        val extract = RestAssured.given().log().all()
-            .body(CreateStationRequest("강동역")).contentType(ContentType.JSON)
-            .`when`().post(STATION_PATH)
-            .then().log().all()
-            .extract();
+        val extract = RestAssured.given().sendPost(STATION_PATH, CreateStationRequest("강동역"))
 
         // then 지하철 역이 생성된다. 그리고 지하철역 목록 조회 시 생성한 역을 찾을 수 있다.
         assertEquals(HttpStatus.CREATED.value(), extract.statusCode())
@@ -50,10 +44,7 @@ class StationAcceptanceTest : AcceptanceTest() {
         stationRepository.saveAll(mutableListOf(Station.from("강동역"), Station.from("천호역")))
 
         // when 지하철역 목록을 조회하면
-        val extract = RestAssured.given().log().all()
-            .`when`().get(STATION_PATH)
-            .then().log().all()
-            .extract()
+        val extract = RestAssured.given().sendGet(STATION_PATH)
 
         // then 2 개의 지하철역을 응답 받는다. 생성한 지하철 역으로만 이루어진 노선이어야 한다.
         assertEquals(HttpStatus.OK.value(), extract.statusCode())
@@ -65,11 +56,7 @@ class StationAcceptanceTest : AcceptanceTest() {
 
     }
 
-    /**
-     * *     * Given 지하철역을 생성하고
-     *     * When 그 지하철역을 삭제하면
-     *     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
+
     @Test
     @DisplayName("생성된 지하철 역을 제거할 수 있다.")
     fun 역_삭제_테스트() {
@@ -77,10 +64,7 @@ class StationAcceptanceTest : AcceptanceTest() {
         val 강동역 = stationRepository.save(Station.from("강동역"))
 
         // when 해당 지하철 역을 삭제하면
-        val extract = RestAssured.given().log().all()
-            .`when`().delete("$STATION_PATH/${강동역.id}")
-            .then().log().all()
-            .extract()
+        val extract = RestAssured.given().sendDelete("$STATION_PATH/${강동역.id}")
 
         // then 목록 조회 시 생성한 역을 찾을 수 없다.
         assertEquals(HttpStatus.NO_CONTENT.value(), extract.statusCode())
