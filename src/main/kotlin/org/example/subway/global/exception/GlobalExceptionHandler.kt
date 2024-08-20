@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = [CustomException::class])
-    fun handleCustomException(exception: CustomException): ResponseEntity<CustomErrorResponse> {
+    @ExceptionHandler(value = [SubwayCustomException::class])
+    fun handleCustomException(exception: SubwayCustomException): ResponseEntity<CustomErrorResponse> {
         val errorCode = exception.subwayErrorCode
         val errorResponse = CustomErrorResponse.of(errorCode = errorCode.code, message = errorCode.message);
         return ResponseEntity.badRequest().body(errorResponse)

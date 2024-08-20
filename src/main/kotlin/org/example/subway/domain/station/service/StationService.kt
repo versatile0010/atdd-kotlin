@@ -5,7 +5,7 @@ import org.example.subway.domain.station.dto.response.CreateStationResponse
 import org.example.subway.domain.station.dto.response.GetStationResponse
 import org.example.subway.domain.station.entity.Station
 import org.example.subway.domain.station.repository.StationRepository
-import org.example.subway.global.exception.CustomException
+import org.example.subway.global.exception.SubwayCustomException
 import org.example.subway.global.exception.SubwayErrorCode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +18,7 @@ class StationService(
     @Transactional
     fun createStation(request: CreateStationRequest): CreateStationResponse {
         if (stationRepository.existsByName(request.name)) {
-            throw CustomException(SubwayErrorCode.SUBWAY_NAME_IS_DUPLICATED)
+            throw SubwayCustomException(SubwayErrorCode.SUBWAY_NAME_IS_DUPLICATED)
         }
         val station = stationRepository.save(Station.from(request.name))
         return CreateStationResponse.from(station)
@@ -26,7 +26,7 @@ class StationService(
 
     fun findStationById(stationId: Long): GetStationResponse {
         val station = stationRepository.findById(stationId)
-            .orElseThrow { CustomException(SubwayErrorCode.SUBWAY_IS_NOT_FOUND) }
+            .orElseThrow { SubwayCustomException(SubwayErrorCode.SUBWAY_IS_NOT_FOUND) }
 
         return GetStationResponse.from(station)
     }
