@@ -5,6 +5,7 @@ import org.example.subway.domain.station.dto.response.CreateStationResponse
 import org.example.subway.domain.station.dto.response.GetStationResponse
 import org.example.subway.domain.station.entity.Station
 import org.example.subway.domain.station.repository.StationRepository
+import org.example.subway.domain.station.repository.findByIdOrThrow
 import org.example.subway.global.exception.SubwayCustomException
 import org.example.subway.global.exception.SubwayErrorCode
 import org.springframework.stereotype.Service
@@ -25,9 +26,7 @@ class StationService(
     }
 
     fun findStationById(stationId: Long): GetStationResponse {
-        val station = stationRepository.findById(stationId)
-            .orElseThrow { SubwayCustomException(SubwayErrorCode.SUBWAY_IS_NOT_FOUND) }
-
+        val station = stationRepository.findByIdOrThrow(stationId)
         return GetStationResponse.from(station)
     }
 
